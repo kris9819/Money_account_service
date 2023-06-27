@@ -1,13 +1,16 @@
-package com.money_account_service.entity;
+package com.money_account_service.entities;
 
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.UUID;
 
 @Table(name = "top_ups")
 @Entity
+@Builder
+@Data
 public class TopUpEntity {
 
     @Id

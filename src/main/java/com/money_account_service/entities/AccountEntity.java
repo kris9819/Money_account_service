@@ -1,12 +1,16 @@
-package com.money_account_service.entity;
+package com.money_account_service.entities;
 
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
 @Table(name = "accounts")
 @Entity
+@Builder
+@Data
 public class AccountEntity {
 
     @Id
