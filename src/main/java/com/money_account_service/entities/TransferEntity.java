@@ -38,5 +38,3 @@ public class TransferEntity {
     @Column(name = "updated_at")
     private Instant updatedAt;
 }
-//TODO: jak to przechowywać, czy chcemy mieć 2 foreign key do kont użytkowników czy trzymamy np. sama nazwe
-// jak powiązać trasakcje przez tabele accounts czy ledger

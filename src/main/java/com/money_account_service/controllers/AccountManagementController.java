@@ -39,12 +39,12 @@ public class AccountManagementController {
 
     @GetMapping("/transactions/{id}")
     public void getTransaction(@PathVariable Long id) {
-        accountManagementService.getTransactionDetails(id);
+//        accountManagementService.getTransactionDetails(id);
     }
 
     @GetMapping("/account/{id}/details")
     public void getAccountDetails(@PathVariable Long id) {
-        accountManagementService.getAccountDetails(id);
+//        accountManagementService.getAccountDetails(id);
     }
 
 }

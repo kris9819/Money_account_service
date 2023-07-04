@@ -18,7 +18,7 @@ public class RequestMapper {
                 .accountNumber(UUID.randomUUID().toString())
                 .balance(new BigDecimal(0.0))
                 .currency(createAccountRequestDto.currency())
-                .userId(createAccountRequestDto.accessToken())
+                .userSub(createAccountRequestDto.accessToken())
                 .createdAt(Instant.now())
                 .updatedAt(Instant.now())
                 .build();
@@ -48,7 +48,3 @@ public class RequestMapper {
                 .build();
     }
 }
-//TODO: Czy powinienem robić kilka mapperów, i czy takie mapowanie jest git
-// Czy accountId powinno być dostarczane z frontu?
-// Jak z exchangeRate, jak to dostarczać?
-// Czy nie lepszy będzie model entity-model-dto
