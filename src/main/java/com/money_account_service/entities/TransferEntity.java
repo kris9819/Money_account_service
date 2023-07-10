@@ -1,8 +1,10 @@
 package com.money_account_service.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
@@ -10,6 +12,8 @@ import java.time.Instant;
 @Entity
 @Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TransferEntity {
 
     @Id
@@ -20,17 +24,11 @@ public class TransferEntity {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "transaction_date")
-    private Instant transactionDate;
+    @Column(name = "transfer_date")
+    private Instant transferDate;
 
     @Column(name = "idempotency_key")
     private String idempotencyKey;
-
-    @Column(name = "ledger_entry_id")
-    private Long ledgerEntryId;
-
-    @Column(name = "user_id")
-    private Long userId;
 
     @Column(name = "created_at")
     private Instant createdAt;

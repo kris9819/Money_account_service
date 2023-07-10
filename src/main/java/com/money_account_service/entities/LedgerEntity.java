@@ -6,22 +6,25 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 
 @Table(name = "ledger")
 @Entity
 @Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class LedgerEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ledger_id")
-    private Long ledgerId;
+    @Column(name = "ledger_record_id")
+    private Long ledgerRecordId;
 
     @Column(name = "debit_account_id")
     private String debitAccountId;
@@ -30,22 +33,22 @@ public class LedgerEntity {
     private String creditAccountId;
 
     @Column(name = "debit_amount")
-    private BigDecimal debitAmount;
+    private Long debitAmount;
 
     @Column(name = "debit_currency")
     private String debitCurrency;
 
     @Column(name = "credit_amount")
-    private BigDecimal creditAmount;
+    private Long creditAmount;
 
     @Column(name = "credit_currency")
     private String creditCurrency;
 
     @Column(name = "exchange_rate")
-    private BigDecimal exchangeRate;
+    private Long exchangeRate;
 
-    @Column(name = "transaction_id")
-    private Long transactionId;
+    @Column(name = "transfer_id")
+    private Long transferId;
 
     @Column(name = "top_up_id")
     private Long topUpId;

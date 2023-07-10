@@ -5,5 +5,5 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record TransfersResponseDto(List<TransferResponseDto> transactions) {
+public record TransfersResponseDto(List<TransferResponseDto> transfers) {
 }

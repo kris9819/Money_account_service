@@ -8,10 +8,6 @@ import com.money_account_service.entities.AccountEntity;
 import com.money_account_service.entities.TopUpEntity;
 import com.money_account_service.entities.TransferEntity;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-
 public class ResponseMapper {
 
     public static AccountDetailsResponseDto accountEntityToAccountDetailsResponse(AccountEntity accountEntity) {
@@ -25,7 +21,7 @@ public class ResponseMapper {
     public static CreateAccountResponseDto accountEntityToCreateAccountResponse(AccountEntity accountEntity) {
         return CreateAccountResponseDto.builder()
                 .accountNumber(accountEntity.getAccountNumber())
-                .balance(accountEntity.getBalance())
+//                .balance(accountEntity.getBalance())
                 .currency(accountEntity.getCurrency())
                 .build();
     }
@@ -39,12 +35,10 @@ public class ResponseMapper {
     public static TransferResponseDto transferEntityToTransferResponse(TransferEntity transferEntity) {
         return TransferResponseDto.builder()
                 .title(transferEntity.getTitle())
-                .amount(new BigDecimal(0.0))
+//                .amount()
                 .receiverName("???")
                 .accountNumber("???")
-                .transactionDate(LocalDate.ofInstant(transferEntity.getTransactionDate(), ZoneOffset.UTC))
+//                .TransferDate(LocalDate.ofInstant(transferEntity.getTransferDate(), ZoneOffset.UTC))
                 .build();
     }
 }
-
-//TODO: jak ogarnąć kwote transakcji?
