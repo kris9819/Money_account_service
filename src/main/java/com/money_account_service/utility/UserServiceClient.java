@@ -19,7 +19,7 @@ public class UserServiceClient {
     private OkHttpClient okHttpClient;
     public static final String AUTHORIZE_URL = "https://localhost:8081/authorize";
 
-    public boolean authorize(String accessToken) {
+    public AuthorizeResponseDto authorize(String accessToken) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             RequestBody requestBody = RequestBody.create(null, new byte[0]);
@@ -34,8 +34,7 @@ public class UserServiceClient {
             Response response = call.execute();
 
             if (response.isSuccessful() && response.body() != null) {
-//                AuthorizeResponseDto authorizeResponseDto = objectMapper.readValue(response.body().string(), AuthorizeResponseDto.class);
-                return true;
+                return objectMapper.readValue(response.body().string(), AuthorizeResponseDto.class);
             }
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Failed to authorize user");

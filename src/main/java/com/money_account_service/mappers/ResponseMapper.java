@@ -2,10 +2,8 @@ package com.money_account_service.mappers;
 
 import com.money_account_service.dtos.response.AccountDetailsResponseDto;
 import com.money_account_service.dtos.response.CreateAccountResponseDto;
-import com.money_account_service.dtos.response.TopUpResponseDto;
 import com.money_account_service.dtos.response.TransferResponseDto;
 import com.money_account_service.entities.AccountEntity;
-import com.money_account_service.entities.TopUpEntity;
 import com.money_account_service.entities.TransferEntity;
 
 public class ResponseMapper {
@@ -26,11 +24,11 @@ public class ResponseMapper {
                 .build();
     }
 
-    public static TopUpResponseDto topUpEntityToTopUpResponse(TopUpEntity topUpEntity) {
-        return TopUpResponseDto.builder()
-                .balance(topUpEntity.getBalance())
-                .build();
-    }
+//    public static TopUpResponseDto topUpEntityToTopUpResponse(TopUpEntity topUpEntity) {
+//        return TopUpResponseDto.builder()
+//                .balance(topUpEntity.getBalance())
+//                .build();
+//    }
 
     public static TransferResponseDto transferEntityToTransferResponse(TransferEntity transferEntity) {
         return TransferResponseDto.builder()

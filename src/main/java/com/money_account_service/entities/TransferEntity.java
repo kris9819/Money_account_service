@@ -30,6 +30,9 @@ public class TransferEntity {
     @Column(name = "idempotency_key")
     private String idempotencyKey;
 
+    @Column(name = "type")
+    private String type;
+
     @Column(name = "created_at")
     private Instant createdAt;
 

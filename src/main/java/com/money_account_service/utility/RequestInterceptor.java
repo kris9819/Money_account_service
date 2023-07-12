@@ -1,24 +1,24 @@
 package com.money_account_service.utility;
 
+import com.money_account_service.dtos.response.AuthorizeResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.HandlerInterceptor;
+
+import java.util.Optional;
 
 @AllArgsConstructor
-public class RequestInterceptor implements HandlerInterceptor {
+public class RequestInterceptor {
 
     private UserServiceClient userServiceClient;
 
-    @Override
-    public boolean preHandle(HttpServletRequest requestServlet, HttpServletResponse responseServlet, Object handler)
+    public Optional<AuthorizeResponseDto> authorizeRequest(HttpServletRequest requestServlet)
     {
         String authHeader = requestServlet.getHeader("Authorization");
 
         if (authHeader.startsWith("Bearer")) {
-            return userServiceClient.authorize(authHeader.substring(7));
+            return Optional.ofNullable(userServiceClient.authorize(authHeader.substring(7)));
         }
 
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong token provided");

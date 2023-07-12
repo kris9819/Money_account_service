@@ -50,9 +50,6 @@ public class LedgerEntity {
     @Column(name = "transfer_id")
     private Long transferId;
 
-    @Column(name = "top_up_id")
-    private Long topUpId;
-
     @Column(name = "created_at")
     private Instant createdAt;
 

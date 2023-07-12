@@ -11,7 +11,7 @@ public class TransferService {
     private UserServiceClient userServiceClient;
 
 
-//    public TransferResponseDto transfer(TransferRequestDto transferRequestDto) {
+//    public TransferResponseDto transfer(TransferRequestDto transferRequestDto, UserModel userModel) {
 //        if (authorizeRequest(transferRequestDto.accessToken()).authorized()) {
 ////            TransferEntity transferEntity = transferRepository.save(RequestMapper.transferRequestToTransferEntity(transferRequestDto));
 ////            return ResponseMapper.transferEntityToTransferResponse(transferEntity);
@@ -20,7 +20,7 @@ public class TransferService {
 //        return null;
 //    }
 //
-//    //    public TransferResponseDto getTransferDetails(Long id) {
+//    //    public TransferResponseDto getTransferDetails(Long id, UserModel userModel) {
 ////        Optional<TransferEntity> transferEntityOptional = transferRepository.findById(id);
 ////        return transferEntityOptional.map(ResponseMapper::transferEntityToTransferResponse).orElse(null);
 ////    }
