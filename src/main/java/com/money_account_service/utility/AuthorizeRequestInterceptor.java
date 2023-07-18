@@ -9,7 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Optional;
 
 @AllArgsConstructor
-public class RequestInterceptor {
+public class AuthorizeRequestInterceptor {
 
     private UserServiceClient userServiceClient;
 

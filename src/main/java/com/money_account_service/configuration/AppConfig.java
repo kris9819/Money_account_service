@@ -1,12 +1,13 @@
 package com.money_account_service.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.money_account_service.repositories.AccountRepository;
-import com.money_account_service.repositories.TopUpRepository;
 import com.money_account_service.repositories.TransferRepository;
 import com.money_account_service.services.AccountService;
 import com.money_account_service.services.TopUpService;
 import com.money_account_service.services.TransferService;
-import com.money_account_service.utility.RequestInterceptor;
+import com.money_account_service.utility.AuthorizeRequestInterceptor;
+import com.money_account_service.utility.AuthorizeRequestResolver;
 import com.money_account_service.utility.UserServiceClient;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
@@ -32,18 +33,23 @@ public class AppConfig {
     }
 
     @Bean
-    public TopUpService topUpService(TopUpRepository topUpRepository, UserServiceClient userServiceClient) {
-        return new TopUpService(topUpRepository, userServiceClient);
+    public TopUpService topUpService(UserServiceClient userServiceClient) {
+        return new TopUpService(userServiceClient);
     }
 
     @Bean
-    public RequestInterceptor requestInterceptor(UserServiceClient userServiceClient) {
-        return new RequestInterceptor(userServiceClient);
+    public AuthorizeRequestInterceptor requestInterceptor(UserServiceClient userServiceClient) {
+        return new AuthorizeRequestInterceptor(userServiceClient);
     }
 
     @Bean
-    public UserServiceClient userServiceClient(OkHttpClient okHttpClient) {
-        return new UserServiceClient(okHttpClient);
+    public UserServiceClient userServiceClient(OkHttpClient okHttpClient, ObjectMapper objectMapper) {
+        return new UserServiceClient(okHttpClient, objectMapper);
+    }
+
+    @Bean
+    public AuthorizeRequestResolver authorizeRequestResolver(UserServiceClient userServiceClient) {
+        return new AuthorizeRequestResolver(userServiceClient);
     }
 
     @Bean
@@ -54,6 +60,11 @@ public class AppConfig {
         builder.sslSocketFactory(getSSLContext().getSocketFactory(), (X509TrustManager) getTrustManagers()[0]);
 
         return builder.build();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 
     private SSLContext getSSLContext() throws NoSuchAlgorithmException, KeyManagementException {
