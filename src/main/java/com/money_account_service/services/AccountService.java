@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 public class AccountService {
 
     private AccountRepository accountRepository;
-    private UserServiceClient userServiceClient;
 
     public CreateAccountResponseDto createAccount(CreateAccountRequestDto createAccountRequestDto, UserModel userModel) {
 //        if (authorizeRequest(createAccountRequestDto.accessToken()).authorized()) {
@@ -20,6 +19,7 @@ public class AccountService {
 ////            return ResponseMapper.accountEntityToCreateAccountResponse(a)
 //            return null;
 //        }
+        System.out.println(userModel);
         return null;
     }
 

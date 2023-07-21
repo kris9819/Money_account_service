@@ -3,7 +3,6 @@ package com.money_account_service.controllers;
 import com.money_account_service.dtos.request.TransferRequestDto;
 import com.money_account_service.dtos.response.AuthorizeResponseDto;
 import com.money_account_service.services.TransferService;
-import com.money_account_service.utility.AuthorizeRequestInterceptor;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,34 +21,14 @@ public class TransferController {
 
     private final TransferService transferService;
 
-    private final AuthorizeRequestInterceptor authorizeRequestInterceptor;
-
     @PostMapping("/transfer")
     public void transfer(@RequestBody TransferRequestDto transferRequestDto, HttpServletRequest request) {
-        Optional<AuthorizeResponseDto> authorizeResponseDto = authorizeRequestInterceptor.authorizeRequest(request);
-        if (authorizeResponseDto.isPresent()) {
-
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Failed to authorize user");
-        }
     }
     @GetMapping("/transfers")
     public void getTransferHistory(HttpServletRequest request) {
-        Optional<AuthorizeResponseDto> authorizeResponseDto = authorizeRequestInterceptor.authorizeRequest(request);
-        if (authorizeResponseDto.isPresent()) {
-
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Failed to authorize user");
-        }
     }
 
     @GetMapping("/transfers/{id}")
     public void getTransfer(@PathVariable Long id, HttpServletRequest request) {
-        Optional<AuthorizeResponseDto> authorizeResponseDto = authorizeRequestInterceptor.authorizeRequest(request);
-        if (authorizeResponseDto.isPresent()) {
-
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Failed to authorize user");
-        }
     }
 }

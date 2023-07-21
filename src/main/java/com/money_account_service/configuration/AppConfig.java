@@ -6,8 +6,6 @@ import com.money_account_service.repositories.TransferRepository;
 import com.money_account_service.services.AccountService;
 import com.money_account_service.services.TopUpService;
 import com.money_account_service.services.TransferService;
-import com.money_account_service.utility.AuthorizeRequestInterceptor;
-import com.money_account_service.utility.AuthorizeRequestResolver;
 import com.money_account_service.utility.UserServiceClient;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
@@ -23,8 +21,8 @@ import java.security.NoSuchAlgorithmException;
 public class AppConfig {
 
     @Bean
-    public AccountService accountService(AccountRepository accountRepository, UserServiceClient userServiceClient) {
-        return new AccountService(accountRepository, userServiceClient);
+    public AccountService accountService(AccountRepository accountRepository) {
+        return new AccountService(accountRepository);
     }
 
     @Bean
@@ -38,18 +36,8 @@ public class AppConfig {
     }
 
     @Bean
-    public AuthorizeRequestInterceptor requestInterceptor(UserServiceClient userServiceClient) {
-        return new AuthorizeRequestInterceptor(userServiceClient);
-    }
-
-    @Bean
     public UserServiceClient userServiceClient(OkHttpClient okHttpClient, ObjectMapper objectMapper) {
         return new UserServiceClient(okHttpClient, objectMapper);
-    }
-
-    @Bean
-    public AuthorizeRequestResolver authorizeRequestResolver(UserServiceClient userServiceClient) {
-        return new AuthorizeRequestResolver(userServiceClient);
     }
 
     @Bean
