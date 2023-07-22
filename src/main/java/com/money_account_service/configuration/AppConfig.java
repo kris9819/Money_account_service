@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.money_account_service.repositories.AccountRepository;
 import com.money_account_service.repositories.TransferRepository;
 import com.money_account_service.services.AccountService;
+import com.money_account_service.services.AuthorizationService;
 import com.money_account_service.services.TopUpService;
 import com.money_account_service.services.TransferService;
 import com.money_account_service.utility.UserServiceClient;
@@ -33,6 +34,11 @@ public class AppConfig {
     @Bean
     public TopUpService topUpService(UserServiceClient userServiceClient) {
         return new TopUpService(userServiceClient);
+    }
+
+    @Bean
+    public AuthorizationService authorizationService(UserServiceClient userServiceClient) {
+        return new AuthorizationService(userServiceClient);
     }
 
     @Bean
