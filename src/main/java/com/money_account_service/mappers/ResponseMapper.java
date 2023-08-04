@@ -6,20 +6,21 @@ import com.money_account_service.dtos.response.TransferResponseDto;
 import com.money_account_service.entities.AccountEntity;
 import com.money_account_service.entities.TransferEntity;
 
+//TODO: Add balance calculation when ledger is ready
 public class ResponseMapper {
 
     public static AccountDetailsResponseDto accountEntityToAccountDetailsResponse(AccountEntity accountEntity) {
         return AccountDetailsResponseDto.builder()
                 .accountNumber(accountEntity.getAccountNumber())
                 .currency(accountEntity.getCurrency())
-                .accountNumber(accountEntity.getAccountNumber())
+                .balance(0L)
                 .build();
     }
 
     public static CreateAccountResponseDto accountEntityToCreateAccountResponse(AccountEntity accountEntity) {
         return CreateAccountResponseDto.builder()
                 .accountNumber(accountEntity.getAccountNumber())
-//                .balance(accountEntity.getBalance())
+                .balance(0L)
                 .currency(accountEntity.getCurrency())
                 .build();
     }

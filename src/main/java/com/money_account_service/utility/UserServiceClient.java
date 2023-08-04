@@ -2,7 +2,6 @@ package com.money_account_service.utility;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.money_account_service.dtos.response.AuthorizeResponseDto;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
