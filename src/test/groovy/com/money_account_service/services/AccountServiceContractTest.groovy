@@ -1,32 +1,33 @@
 package com.money_account_service.services
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.money_account_service.dtos.request.CreateAccountRequestDto
 import com.money_account_service.dtos.response.AccountDetailsResponseDto
 import com.money_account_service.dtos.response.AuthorizeResponseDto
 import com.money_account_service.dtos.response.CreateAccountResponseDto
 import com.money_account_service.entities.AccountEntity
-import com.money_account_service.models.UserModel
-import org.spockframework.spring.SpringBean
 import com.money_account_service.repositories.AccountRepository
 import com.money_account_service.utility.UserServiceClient
-import okhttp3.Call
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import org.json.JSONObject
+import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpHeaders
+import org.springframework.test.context.TestPropertySource
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spock.lang.Specification
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest
+@AutoConfigureMockMvc
+@TestPropertySource(locations = "classpath:application-test.properties")
 class AccountServiceContractTest extends Specification {
 
     @Autowired
-    private ObjectMapper objectMapper
+    private MockMvc mockMvc
     @Autowired
-    private OkHttpClient okHttpClient
+    private ObjectMapper objectMapper
     @SpringBean
     private final AccountRepository accountRepository = Mock(AccountRepository)
     @SpringBean
@@ -36,20 +37,18 @@ class AccountServiceContractTest extends Specification {
 
     def setup() {
         authorizationService = new AuthorizationService(userServiceClient)
-        accountService = new AccountService(accountRepository, null)
+        accountService = new AccountService(accountRepository)
     }
 
     def "Should add new account"() {
         given: "CreateAccountRequestDto is provided"
-            JSONObject createAccountRequestDto = new JSONObject()
-            def createAccountUrl = "https://localhost:8080/account"
-            final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+            CreateAccountRequestDto createAccountRequestDto1 = new CreateAccountRequestDto("PLN")
 
-            createAccountRequestDto.put("currency", "PLN")
+        and: "CreateAccountResponseDto is provided"
 
-            RequestBody requestBody = RequestBody.create(createAccountRequestDto.toString(), JSON)
+            CreateAccountResponseDto createAccountResponseDto = new CreateAccountResponseDto("123", 0L, "PLN")
 
-        and: "expected AccountEntity is provided"
+        and: "AccountEntity is provided"
             AccountEntity accountEntity = AccountEntity.builder()
                 .accountNumber("123")
                 .currency("PLN")
@@ -65,32 +64,24 @@ class AccountServiceContractTest extends Specification {
                 .userSub("123")
                 .build()
 
-        when: "account method is called"
-            Request request = new Request.Builder()
-                .url(createAccountUrl)
-                .addHeader("Authorization", "Bearer 123")
-                .post(requestBody)
-                .build()
+        accountRepository.save(_ as AccountEntity) >> accountEntity
+        accountRepository.findByUserSub(_) >> Optional.ofNullable(null)
+        userServiceClient.authorize(_) >> authorizeResponseDto
 
-            Call call = okHttpClient.newCall(request)
-            Response response = call.execute()
-
-
-        then: "database connection is mocked"
-            accountRepository.save(_ as AccountEntity) >> accountEntity
-            accountRepository.findByUserSub(_) >> Optional.ofNullable(null)
-            userServiceClient.authorize(_) >> authorizeResponseDto
-
-        and: "expected values are returned"
-            CreateAccountResponseDto createAccountResponseDto1 = objectMapper.readValue(response.body().string(), CreateAccountResponseDto.class)
-            createAccountResponseDto1.currency() == "PLN"
-            createAccountResponseDto1.balance() == 0L
-            createAccountResponseDto1.accountNumber() == "123"
+        expect: "API call response is asserted"
+            mockMvc.perform(MockMvcRequestBuilders.post("/account")
+                    .contentType("application/json")
+                    .header((HttpHeaders.AUTHORIZATION), "Bearer 123")
+                    .content(objectMapper.writeValueAsString(createAccountRequestDto1)))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andReturn()
+                    .response
+                    .contentAsString == objectMapper.writeValueAsString(createAccountResponseDto)
     }
 
     def "Should get account info"() {
-        given: "CreateAccountRequestDto is provided"
-        def getAccountInfoUrl = "https://localhost:8080/account/1/details"
+        given:
+        AccountDetailsResponseDto accountDetailsResponseDto = new AccountDetailsResponseDto("123", 0L, "PLN")
 
         and: "expected AccountEntity is provided"
         AccountEntity accountEntity = AccountEntity.builder()
@@ -106,24 +97,15 @@ class AccountServiceContractTest extends Specification {
                 .userSub("123")
                 .build()
 
-        when: "account method is called"
-        Request request = new Request.Builder()
-                .url(getAccountInfoUrl)
-                .addHeader("Authorization", "Bearer 123")
-                .build()
-
-        Call call = okHttpClient.newCall(request)
-        Response response = call.execute()
-
-
-        then: "database connection is mocked"
         accountRepository.findById(_) >> Optional.ofNullable(accountEntity)
         userServiceClient.authorize(_) >> authorizeResponseDto
 
-        and: "expected values are returned"
-        AccountDetailsResponseDto accountDetailsResponseDto = objectMapper.readValue(response.body().string(), AccountDetailsResponseDto.class)
-        accountDetailsResponseDto.currency() == "PLN"
-        accountDetailsResponseDto.balance() == 0L
-        accountDetailsResponseDto.accountNumber() == "123"
+        expect: "API call response is asserted"
+            mockMvc.perform(MockMvcRequestBuilders.get("/account/{id}/details", 1L)
+                    .header((HttpHeaders.AUTHORIZATION), "Bearer 123"))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andReturn()
+                    .response
+                    .contentAsString == objectMapper.writeValueAsString(accountDetailsResponseDto)
     }
 }

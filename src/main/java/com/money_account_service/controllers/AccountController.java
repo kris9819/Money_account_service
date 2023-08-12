@@ -3,6 +3,7 @@ package com.money_account_service.controllers;
 import com.money_account_service.dtos.request.CreateAccountRequestDto;
 import com.money_account_service.dtos.response.AccountDetailsResponseDto;
 import com.money_account_service.dtos.response.CreateAccountResponseDto;
+import com.money_account_service.mappers.ResponseMapper;
 import com.money_account_service.services.AccountService;
 import com.money_account_service.services.AuthorizationService;
 import com.money_account_service.utility.UserServiceClient;
@@ -19,22 +20,19 @@ public class AccountController extends AuthorizationController {
 
     private final AccountService accountService;
 
-    private final UserServiceClient userServiceClient;
-
-    public AccountController(AuthorizationService authorizationService, AccountService accountService, UserServiceClient userServiceClient) {
+    public AccountController(AuthorizationService authorizationService, AccountService accountService) {
         super(authorizationService);
         this.accountService = accountService;
-        this.userServiceClient = userServiceClient;
     }
 
     @PostMapping("/account")
     public CreateAccountResponseDto createAccount(@RequestBody CreateAccountRequestDto createAccountRequestDto, @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
-        return accountService.createAccount(createAccountRequestDto, authorize(accessToken));
+        return ResponseMapper.accountEntityToCreateAccountResponse(accountService.createAccount(createAccountRequestDto, authorize(accessToken)));
     }
 
     @GetMapping("/account/{id}/details")
     public AccountDetailsResponseDto getAccountDetails(@PathVariable Long id, @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
-        return accountService.getAccountDetails(id, authorize(accessToken));
+        return ResponseMapper.accountEntityToAccountDetailsResponse(accountService.getAccountDetails(id, authorize(accessToken)));
     }
 
 }

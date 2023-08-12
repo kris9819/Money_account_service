@@ -7,7 +7,6 @@ import com.money_account_service.services.AccountService;
 import com.money_account_service.services.AuthorizationService;
 import com.money_account_service.services.TopUpService;
 import com.money_account_service.services.TransferService;
-import com.money_account_service.utility.DateTimeProvider;
 import com.money_account_service.utility.UserServiceClient;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
@@ -18,13 +17,14 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 @Configuration
 public class AppConfig {
 
     @Bean
-    public AccountService accountService(AccountRepository accountRepository, DateTimeProvider dateTimeProvider) {
-        return new AccountService(accountRepository, dateTimeProvider);
+    public AccountService accountService(AccountRepository accountRepository) {
+        return new AccountService(accountRepository);
     }
 
     @Bean
@@ -58,18 +58,13 @@ public class AppConfig {
     }
 
     @Bean
-    public DateTimeProvider localDateTime() {
-        return new DateTimeProvider();
-    }
-
-    @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper();
     }
 
     private SSLContext getSSLContext() throws NoSuchAlgorithmException, KeyManagementException {
         SSLContext sslContext = SSLContext.getInstance("SSL");
-        sslContext.init(null, getTrustManagers(), new java.security.SecureRandom());
+        sslContext.init(null, getTrustManagers(), new SecureRandom());
 
         return sslContext;
     }
