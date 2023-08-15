@@ -28,13 +28,13 @@ public class AppConfig {
     }
 
     @Bean
-    public TransferService transferService(TransferRepository transferRepository, UserServiceClient userServiceClient) {
-        return new TransferService(transferRepository, userServiceClient);
+    public TransferService transferService(TransferRepository transferRepository) {
+        return new TransferService(transferRepository);
     }
 
     @Bean
-    public TopUpService topUpService(UserServiceClient userServiceClient) {
-        return new TopUpService(userServiceClient);
+    public TopUpService topUpService(TransferRepository transferRepository) {
+        return new TopUpService(transferRepository);
     }
 
     @Bean

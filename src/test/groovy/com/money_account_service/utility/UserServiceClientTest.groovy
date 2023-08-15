@@ -12,7 +12,7 @@ import javax.net.ssl.X509TrustManager
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 
-class UserServiceClientTestUT extends Specification {
+class UserServiceClientTest extends Specification {
 
     WireMockGroovy wireMock = new WireMockGroovy(8081)
 
