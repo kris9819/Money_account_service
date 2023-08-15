@@ -17,6 +17,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 @Configuration
 public class AppConfig {
@@ -63,7 +64,7 @@ public class AppConfig {
 
     private SSLContext getSSLContext() throws NoSuchAlgorithmException, KeyManagementException {
         SSLContext sslContext = SSLContext.getInstance("SSL");
-        sslContext.init(null, getTrustManagers(), new java.security.SecureRandom());
+        sslContext.init(null, getTrustManagers(), new SecureRandom());
 
         return sslContext;
     }

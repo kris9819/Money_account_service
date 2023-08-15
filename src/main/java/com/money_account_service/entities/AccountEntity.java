@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Clock;
 import java.time.Instant;
 
 @Table(name = "accounts")
@@ -20,6 +21,14 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccountEntity {
+
+    public AccountEntity(String accountNumber, String currency, String userSub) {
+        this.accountNumber = accountNumber;
+        this.currency = currency;
+        this.userSub = userSub;
+        this.createdAt = Clock.systemUTC().instant();
+        this.updatedAt = Clock.systemUTC().instant();
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
