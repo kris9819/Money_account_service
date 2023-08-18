@@ -1,20 +1,16 @@
 package com.money_account_service.utility
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.tomjankes.wiremock.WireMockGroovy
+import com.github.tomakehurst.wiremock.WireMockServer
 import com.money_account_service.dtos.response.AuthorizeResponseDto
 import okhttp3.OkHttpClient
 import spock.lang.Specification
 
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
-import java.security.SecureRandom
-import java.security.cert.X509Certificate
+import static com.github.tomakehurst.wiremock.client.WireMock.*
 
 class UserServiceClientTest extends Specification {
 
-    WireMockGroovy wireMock = new WireMockGroovy(8081)
+    WireMockServer wireMock = new WireMockServer(8081)
 
     private OkHttpClient okHttpClient
     private UserServiceClient userServiceClient
@@ -24,6 +20,13 @@ class UserServiceClientTest extends Specification {
         objectMapper = new ObjectMapper()
         okHttpClient = getOkHttpClient()
         userServiceClient = new UserServiceClient(okHttpClient, objectMapper)
+
+        wireMock.start()
+    }
+
+    def cleanup() {
+        wireMock.resetAll()
+        wireMock.stop()
     }
 
     def "Should authorize request and return user details"() {
@@ -34,18 +37,10 @@ class UserServiceClientTest extends Specification {
                 .name("kris")
                 .build()
 
-        wireMock.stub {
-            request {
-                method "GET"
-                url "/authorize"
-            }
-            response {
-                status 200
-                body objectMapper.writeValueAsString(authorizeResponseDto1)
-                headers { "Content-Type" "application/json" }
-            }
-        }
-
+        wireMock.stubFor(
+                post(urlEqualTo("/authorize"))
+                        .willReturn(okJson(objectMapper.writeValueAsString(authorizeResponseDto1)))
+        )
 
         when: "authorize method is called"
             def authorizeResponse = userServiceClient.authorize("Bearer 123")
@@ -57,34 +52,6 @@ class UserServiceClientTest extends Specification {
     }
 
     private OkHttpClient getOkHttpClient() {
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.hostnameVerifier((hostname, session) -> true);
-
-        SSLContext sslContext = SSLContext.getInstance("TLS")
-        sslContext.init(null, getTrustManagers(), new SecureRandom());
-
-        builder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) getTrustManagers()[0]);
-
-        return builder.build();
-    }
-
-
-    private static TrustManager[] getTrustManagers() {
-        return new TrustManager[]{
-                new X509TrustManager() {
-                    @Override
-                    public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                    }
-
-                    @Override
-                    public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                    }
-
-                    @Override
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return new X509Certificate[]{};
-                    }
-                }
-        };
+        return new OkHttpClient.Builder().build()
     }
 }
