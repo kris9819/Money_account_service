@@ -2,6 +2,7 @@ package com.money_account_service.controllers;
 
 import com.money_account_service.dtos.request.TransferRequestDto;
 import com.money_account_service.dtos.response.TransferResponseDto;
+import com.money_account_service.dtos.response.TransfersResponseDto;
 import com.money_account_service.mappers.ResponseMapper;
 import com.money_account_service.services.AuthorizationService;
 import com.money_account_service.services.TransferService;
@@ -28,7 +29,8 @@ public class TransferController extends AuthorizationController{
         return ResponseMapper.transferEntityToTransferResponse(transferService.transfer(transferRequestDto, authorize(accessToken)));
     }
     @GetMapping("/transfers")
-    public void getTransferHistory(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
+    public TransfersResponseDto getTransferHistory(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
+        return ResponseMapper.transferEntityListToTransfersResponse(transferService.getTransferHistory(authorize(accessToken)));
     }
 
     @GetMapping("/transfers/{id}")

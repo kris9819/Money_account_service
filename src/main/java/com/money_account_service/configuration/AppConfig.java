@@ -1,6 +1,7 @@
 package com.money_account_service.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.money_account_service.repositories.AccountRepository;
 import com.money_account_service.repositories.TransferRepository;
 import com.money_account_service.services.AccountService;
@@ -57,9 +58,12 @@ public class AppConfig {
         return builder.build();
     }
 
+
     @Bean
     public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        return objectMapper;
     }
 
     private SSLContext getSSLContext() throws NoSuchAlgorithmException, KeyManagementException {

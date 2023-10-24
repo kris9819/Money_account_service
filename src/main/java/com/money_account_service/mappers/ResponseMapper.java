@@ -4,8 +4,11 @@ import com.money_account_service.dtos.response.AccountDetailsResponseDto;
 import com.money_account_service.dtos.response.CreateAccountResponseDto;
 import com.money_account_service.dtos.response.TopUpResponseDto;
 import com.money_account_service.dtos.response.TransferResponseDto;
+import com.money_account_service.dtos.response.TransfersResponseDto;
 import com.money_account_service.entities.AccountEntity;
 import com.money_account_service.entities.TransferEntity;
+
+import java.util.List;
 
 //TODO: Add balance calculation and account numbers when ledger is ready
 public class ResponseMapper {
@@ -39,6 +42,12 @@ public class ResponseMapper {
                 .receiverName("???")
                 .accountNumber("???")
                 .transferDate(transferEntity.getTransferDate())
+                .build();
+    }
+
+    public static TransfersResponseDto transferEntityListToTransfersResponse(List<TransferEntity> transferEntityList) {
+        return TransfersResponseDto.builder()
+                .transfers(transferEntityList)
                 .build();
     }
 }

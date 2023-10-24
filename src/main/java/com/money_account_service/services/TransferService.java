@@ -1,11 +1,9 @@
 package com.money_account_service.services;
 
 import com.money_account_service.dtos.request.TransferRequestDto;
-import com.money_account_service.dtos.response.TransferResponseDto;
 import com.money_account_service.entities.TransferEntity;
 import com.money_account_service.models.UserModel;
 import com.money_account_service.repositories.TransferRepository;
-import com.money_account_service.utility.UserServiceClient;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -35,7 +33,15 @@ public class TransferService {
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Transaction with %d id doesn't exist", id));
     }
-//    public List<TransferEntity> getTransferHistory(UserModel userModel) {
-//    }
+
+    public List<TransferEntity> getTransferHistory(UserModel userModel) {
+        Optional<List<TransferEntity>> optionalTransferEntityList = transferRepository.findAllTransfersForUser(userModel.userSub());
+
+        if (optionalTransferEntityList.isPresent()) {
+            return optionalTransferEntityList.get();
+        }
+
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "You don't have any transactions yet");
+    }
 
 }
