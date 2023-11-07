@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
+
 @AllArgsConstructor
 public class TopUpService {
 
@@ -17,7 +19,9 @@ public class TopUpService {
     public TransferEntity topUp(TopUpRequestDto topUpRequestDto, UserModel userModel) {
         TransferEntity transferEntity = new TransferEntity("TOP_UP", topUpRequestDto.idempotencyKey(), "TOP_UP");
 
-        if (transferRepository.findByIdempotencyKey(transferEntity.getIdempotencyKey()).isPresent()) {
+        Optional<TransferEntity> transferEntityFoundByIdempotencyKey = Optional.ofNullable(transferRepository.findByIdempotencyKey(transferEntity.getIdempotencyKey()));
+
+        if (transferEntityFoundByIdempotencyKey.isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "This transaction already exists");
         }
 

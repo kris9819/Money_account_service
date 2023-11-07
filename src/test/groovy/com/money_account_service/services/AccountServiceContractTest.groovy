@@ -19,24 +19,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spock.lang.Specification
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@TestPropertySource(locations = "classpath:application-test.properties")
-class AccountServiceContractTest extends Specification {
+class AccountServiceContractTest extends BaseWeb {
 
     @Autowired
-    private MockMvc mockMvc
-    @Autowired
-    private ObjectMapper objectMapper
-    @SpringBean
-    private final AccountRepository accountRepository = Mock(AccountRepository)
-    @SpringBean
-    private final UserServiceClient userServiceClient = Mock(UserServiceClient)
-    private AuthorizationService authorizationService
+    private AccountRepository accountRepository
     private AccountService accountService
 
     def setup() {
-        authorizationService = new AuthorizationService(userServiceClient)
         accountService = new AccountService(accountRepository)
     }
 
@@ -45,17 +34,7 @@ class AccountServiceContractTest extends Specification {
             CreateAccountRequestDto createAccountRequestDto1 = new CreateAccountRequestDto("PLN")
 
         and: "CreateAccountResponseDto is provided"
-
             CreateAccountResponseDto createAccountResponseDto = new CreateAccountResponseDto("123", 0L, "PLN")
-
-        and: "AccountEntity is provided"
-            AccountEntity accountEntity = AccountEntity.builder()
-                .accountNumber("123")
-                .currency("PLN")
-                .userSub("123")
-                .createdAt(null)
-                .updatedAt(null)
-                .build()
 
         and: "AuthorizeResponseDto is provided"
         AuthorizeResponseDto authorizeResponseDto = AuthorizeResponseDto.builder()
@@ -64,8 +43,6 @@ class AccountServiceContractTest extends Specification {
                 .userSub("123")
                 .build()
 
-        accountRepository.save(_ as AccountEntity) >> accountEntity
-        accountRepository.findByUserSub(_) >> Optional.ofNullable(null)
         userServiceClient.authorize(_) >> authorizeResponseDto
 
         expect: "API call response is asserted"
@@ -97,7 +74,8 @@ class AccountServiceContractTest extends Specification {
                 .userSub("123")
                 .build()
 
-        accountRepository.findById(_) >> Optional.ofNullable(accountEntity)
+        and: "AccountEntity is added to database"
+        accountRepository.save(accountEntity)
         userServiceClient.authorize(_) >> authorizeResponseDto
 
         expect: "API call response is asserted"

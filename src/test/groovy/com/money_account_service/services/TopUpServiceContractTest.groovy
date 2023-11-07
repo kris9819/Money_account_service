@@ -24,24 +24,13 @@ import spock.lang.Specification
 
 import java.time.Clock
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@TestPropertySource(locations = "classpath:application-test.properties")
-class TopUpServiceContractTest extends Specification {
+class TopUpServiceContractTest extends BaseWeb {
 
     @Autowired
-    private MockMvc mockMvc
-    @Autowired
-    private ObjectMapper objectMapper
-    @SpringBean
-    private final TransferRepository transferRepository = Mock(TransferRepository)
-    @SpringBean
-    private final UserServiceClient userServiceClient = Mock(UserServiceClient)
-    private AuthorizationService authorizationService
+    private TransferRepository transferRepository
     private TopUpService topUpService
 
     def setup() {
-        authorizationService = new AuthorizationService(userServiceClient)
         topUpService = new TopUpService(transferRepository)
     }
 
@@ -59,7 +48,7 @@ class TopUpServiceContractTest extends Specification {
         TransferEntity transferEntity = TransferEntity.builder()
                 .title("TOP_UP")
                 .transferDate(ts)
-                .idempotencyKey("123")
+                .idempotencyKey("1234")
                 .type("TOP_UP")
                 .createdAt(null)
                 .updatedAt(null)
@@ -72,8 +61,8 @@ class TopUpServiceContractTest extends Specification {
                 .userSub("123")
                 .build()
 
-        transferRepository.save(_ as TransferEntity) >> transferEntity
-        transferRepository.findByIdempotencyKey(_ as String) >> Optional.empty()
+        and: "TransferEntity is added to database"
+        transferRepository.save(transferEntity)
         userServiceClient.authorize(_) >> authorizeResponseDto
 
         expect: "API call response is asserted"

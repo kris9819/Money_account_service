@@ -23,24 +23,13 @@ import spock.lang.Specification
 
 import java.time.Clock
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@TestPropertySource(locations = "classpath:application-test.properties")
-class TransferServiceContractTest extends Specification {
+class TransferServiceContractTest extends BaseWeb {
 
     @Autowired
-    private MockMvc mockMvc
-    @Autowired
-    private ObjectMapper objectMapper
-    @SpringBean
-    private final TransferRepository transferRepository = Mock(TransferRepository)
-    @SpringBean
-    private final UserServiceClient userServiceClient = Mock(UserServiceClient)
-    private AuthorizationService authorizationService
+    private TransferRepository transferRepository
     private TransferService transferService
 
     def setup() {
-        authorizationService = new AuthorizationService(userServiceClient)
         transferService = new TransferService(transferRepository)
     }
 
@@ -49,17 +38,7 @@ class TransferServiceContractTest extends Specification {
         TransferRequestDto transferRequestDto = new TransferRequestDto("test", "123", "transfer", 0L, "123")
 
         and: "TransferResponseDto is provided"
-        TransferResponseDto transferResponseDto = new TransferResponseDto("???", "???", "transfer", null,0L)
-
-        and: "TransferEntity is provided"
-        TransferEntity transferEntity = TransferEntity.builder()
-                .title("transfer")
-                .transferDate(null)
-                .idempotencyKey("123")
-                .type("TRANSFER")
-                .createdAt(null)
-                .updatedAt(null)
-                .build()
+        TransferResponseDto transferResponseDto = new TransferResponseDto("???", "???", "transfer", Clock.systemUTC().instant(),0L)
 
         and: "AuthorizeResponseDto is provided"
         AuthorizeResponseDto authorizeResponseDto = AuthorizeResponseDto.builder()
@@ -68,8 +47,6 @@ class TransferServiceContractTest extends Specification {
                 .userSub("123")
                 .build()
 
-        transferRepository.save(_ as TransferEntity) >> transferEntity
-        transferRepository.findByIdempotencyKey(_ as String) >> Optional.empty()
         userServiceClient.authorize(_) >> authorizeResponseDto
 
         expect: "API call response is asserted"
@@ -107,7 +84,6 @@ class TransferServiceContractTest extends Specification {
                 .updatedAt(null)
                 .build()
 
-
         and: "TransferResponseDto is provided"
         TransfersResponseDto transfersResponseDto = new TransfersResponseDto(List.of(transferEntity1, transferEntity2))
 
@@ -118,7 +94,8 @@ class TransferServiceContractTest extends Specification {
                 .userSub("123")
                 .build()
 
-        transferRepository.findAllTransfersForUser(_ as String) >> Optional.ofNullable(List.of(transferEntity1, transferEntity2))
+        and: "TransferEntities are added to database"
+        transferRepository.saveAll(List.of(transferEntity1, transferEntity2))
         userServiceClient.authorize(_) >> authorizeResponseDto
 
         expect: "API call response is asserted"
@@ -155,7 +132,8 @@ class TransferServiceContractTest extends Specification {
                 .userSub("123")
                 .build()
 
-        transferRepository.findById(_ as Long) >> Optional.ofNullable(transferEntity)
+        and: "TransferEntity is added to database"
+        transferRepository.save(transferEntity)
         userServiceClient.authorize(_) >> authorizeResponseDto
 
         expect: "API call response is asserted"

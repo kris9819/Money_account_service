@@ -19,7 +19,9 @@ public class TransferService {
     public TransferEntity transfer(TransferRequestDto transferRequestDto, UserModel userModel) {
         TransferEntity transferEntity = new TransferEntity(transferRequestDto.title(), transferRequestDto.idempotencyKey(), "TRANSFER");
 
-        if (transferRepository.findByIdempotencyKey(transferEntity.getIdempotencyKey()).isPresent()) {
+        Optional<TransferEntity> transferEntityFoundByIdempotencyKey = Optional.ofNullable(transferRepository.findByIdempotencyKey(transferEntity.getIdempotencyKey()));
+
+        if (transferEntityFoundByIdempotencyKey.isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "This transaction already exists");
         }
         return transferRepository.save(transferEntity);
@@ -28,20 +30,14 @@ public class TransferService {
     public TransferEntity getTransferDetails(Long id, UserModel userModel) {
         Optional<TransferEntity> transferEntityOptional = transferRepository.findById(id);
 
-        if (transferEntityOptional.isPresent()) {
-            return transferEntityOptional.get();
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Transaction with %d id doesn't exist", id));
+        return transferEntityOptional.orElseThrow(
+                () ->new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Transaction with %d id doesn't exist", id)));
     }
 
     public List<TransferEntity> getTransferHistory(UserModel userModel) {
-        Optional<List<TransferEntity>> optionalTransferEntityList = transferRepository.findAllTransfersForUser(userModel.userSub());
+        Optional<List<TransferEntity>> optionalTransferEntityList = Optional.ofNullable(transferRepository.findAllTransfersForUser(userModel.userSub()));
 
-        if (optionalTransferEntityList.isPresent()) {
-            return optionalTransferEntityList.get();
-        }
-
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "You don't have any transactions yet");
+        return optionalTransferEntityList.orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "You don't have any transactions yet"));
     }
-
 }
