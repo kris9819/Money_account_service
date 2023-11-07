@@ -1,6 +1,8 @@
 package com.money_account_service.controllers;
 
 import com.money_account_service.dtos.request.TopUpRequestDto;
+import com.money_account_service.dtos.response.TopUpResponseDto;
+import com.money_account_service.mappers.ResponseMapper;
 import com.money_account_service.services.AuthorizationService;
 import com.money_account_service.services.TopUpService;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +23,7 @@ public class TopUpController extends AuthorizationController {
 
 
     @PostMapping("/topUp")
-    public void topUp(@RequestBody TopUpRequestDto topUpRequestDto, @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
+    public TopUpResponseDto topUp(@RequestBody TopUpRequestDto topUpRequestDto, @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
+        return ResponseMapper.transferEntityToTopUpResponse(topUpService.topUp(topUpRequestDto, authorize(accessToken)));
     }
 }

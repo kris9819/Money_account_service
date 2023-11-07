@@ -1,38 +1,43 @@
 package com.money_account_service.services;
 
+import com.money_account_service.dtos.request.TransferRequestDto;
+import com.money_account_service.entities.TransferEntity;
+import com.money_account_service.models.UserModel;
 import com.money_account_service.repositories.TransferRepository;
-import com.money_account_service.utility.UserServiceClient;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 public class TransferService {
 
     private TransferRepository transferRepository;
-    private UserServiceClient userServiceClient;
 
+    public TransferEntity transfer(TransferRequestDto transferRequestDto, UserModel userModel) {
+        TransferEntity transferEntity = new TransferEntity(transferRequestDto.title(), transferRequestDto.idempotencyKey(), "TRANSFER");
 
-//    public TransferResponseDto transfer(TransferRequestDto transferRequestDto, UserModel userModel) {
-//        if (authorizeRequest(transferRequestDto.accessToken()).authorized()) {
-////            TransferEntity transferEntity = transferRepository.save(RequestMapper.transferRequestToTransferEntity(transferRequestDto));
-////            return ResponseMapper.transferEntityToTransferResponse(transferEntity);
-//            return null;
-//        }
-//        return null;
-//    }
-//
-//    //    public TransferResponseDto getTransferDetails(Long id, UserModel userModel) {
-////        Optional<TransferEntity> transferEntityOptional = transferRepository.findById(id);
-////        return transferEntityOptional.map(ResponseMapper::transferEntityToTransferResponse).orElse(null);
-////    }
-//
-//    private AuthorizeResponseDto authorizeRequest(String accessToken) {
-//        Optional<AuthorizeResponseDto> authorizeResponseDtoOptional = restTemplateWrapper.authorizeRequest(
-//                new AuthorizeRequestDto(accessToken));
-//
-//        if (authorizeResponseDtoOptional.isPresent()) {
-//            return authorizeResponseDtoOptional.get();
-//        } else {
-//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Failed to authorize request");
-//        }
-//    }
+        Optional<TransferEntity> transferEntityFoundByIdempotencyKey = Optional.ofNullable(transferRepository.findByIdempotencyKey(transferEntity.getIdempotencyKey()));
+
+        if (transferEntityFoundByIdempotencyKey.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "This transaction already exists");
+        }
+        return transferRepository.save(transferEntity);
+    }
+
+    public TransferEntity getTransferDetails(Long id, UserModel userModel) {
+        Optional<TransferEntity> transferEntityOptional = transferRepository.findById(id);
+
+        return transferEntityOptional.orElseThrow(
+                () ->new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Transaction with %d id doesn't exist", id)));
+    }
+
+    public List<TransferEntity> getTransferHistory(UserModel userModel) {
+        Optional<List<TransferEntity>> optionalTransferEntityList = Optional.ofNullable(transferRepository.findAllTransfersForUser(userModel.userSub()));
+
+        return optionalTransferEntityList.orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "You don't have any transactions yet"));
+    }
 }

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Clock;
 import java.time.Instant;
 
 @Table(name = "transfers")
@@ -15,6 +16,15 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransferEntity {
+
+    public TransferEntity(String title, String idempotencyKey, String type) {
+        this.title = title;
+        this.transferDate = Clock.systemUTC().instant();
+        this.idempotencyKey = idempotencyKey;
+        this.type = type;
+        this.createdAt = Clock.systemUTC().instant();
+        this.updatedAt = Clock.systemUTC().instant();
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

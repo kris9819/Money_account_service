@@ -2,11 +2,15 @@ package com.money_account_service.mappers;
 
 import com.money_account_service.dtos.response.AccountDetailsResponseDto;
 import com.money_account_service.dtos.response.CreateAccountResponseDto;
+import com.money_account_service.dtos.response.TopUpResponseDto;
 import com.money_account_service.dtos.response.TransferResponseDto;
+import com.money_account_service.dtos.response.TransfersResponseDto;
 import com.money_account_service.entities.AccountEntity;
 import com.money_account_service.entities.TransferEntity;
 
-//TODO: Add balance calculation when ledger is ready
+import java.util.List;
+
+//TODO: Add balance calculation and account numbers when ledger is ready
 public class ResponseMapper {
 
     public static AccountDetailsResponseDto accountEntityToAccountDetailsResponse(AccountEntity accountEntity) {
@@ -25,19 +29,25 @@ public class ResponseMapper {
                 .build();
     }
 
-//    public static TopUpResponseDto topUpEntityToTopUpResponse(TopUpEntity topUpEntity) {
-//        return TopUpResponseDto.builder()
-//                .balance(topUpEntity.getBalance())
-//                .build();
-//    }
+    public static TopUpResponseDto transferEntityToTopUpResponse(TransferEntity transferEntity) {
+        return TopUpResponseDto.builder()
+                .balance(0L)
+                .build();
+    }
 
     public static TransferResponseDto transferEntityToTransferResponse(TransferEntity transferEntity) {
         return TransferResponseDto.builder()
                 .title(transferEntity.getTitle())
-//                .amount()
+                .amount(0L)
                 .receiverName("???")
                 .accountNumber("???")
-//                .TransferDate(LocalDate.ofInstant(transferEntity.getTransferDate(), ZoneOffset.UTC))
+                .transferDate(transferEntity.getTransferDate())
+                .build();
+    }
+
+    public static TransfersResponseDto transferEntityListToTransfersResponse(List<TransferEntity> transferEntityList) {
+        return TransfersResponseDto.builder()
+                .transfers(transferEntityList)
                 .build();
     }
 }
