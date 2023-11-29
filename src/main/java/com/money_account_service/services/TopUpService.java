@@ -2,7 +2,6 @@ package com.money_account_service.services;
 
 import com.money_account_service.dtos.request.TopUpRequestDto;
 import com.money_account_service.entities.TransferEntity;
-import com.money_account_service.models.UserModel;
 import com.money_account_service.repositories.TransferRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,8 +15,8 @@ public class TopUpService {
 
     private TransferRepository transferRepository;
     @Transactional
-    public TransferEntity topUp(TopUpRequestDto topUpRequestDto, UserModel userModel) {
-        TransferEntity transferEntity = new TransferEntity("TOP_UP", topUpRequestDto.idempotencyKey(), "TOP_UP");
+    public TransferEntity topUp(TopUpRequestDto topUpRequestDto, Long accountId) {
+        TransferEntity transferEntity = new TransferEntity("TOP_UP", topUpRequestDto.idempotencyKey(), accountId, "TOP_UP");
 
         Optional<TransferEntity> transferEntityFoundByIdempotencyKey = Optional.ofNullable(transferRepository.findByIdempotencyKey(transferEntity.getIdempotencyKey()));
 

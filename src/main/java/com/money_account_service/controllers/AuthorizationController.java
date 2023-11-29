@@ -9,7 +9,11 @@ public abstract class AuthorizationController {
 
     private final AuthorizationService authorizationService;
 
-    public UserModel authorize(String token) {
+    public Long authorize(String token) {
         return authorizationService.authorize(token);
+    }
+
+    public UserModel authorizeWithUserModel(String token) {
+        return authorizationService.authorizeWithUserModel(token);
     }
 }

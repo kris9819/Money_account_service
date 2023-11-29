@@ -34,7 +34,7 @@ public class AccountService {
     }
 
     @Transactional
-    public AccountEntity getAccountDetails(Long id, UserModel userModel) {
+    public AccountEntity getAccountDetails(Long id) {
         Optional<AccountEntity> accountEntityOptional = accountRepository.findById(id);
 
         return accountEntityOptional.orElseThrow(

@@ -39,8 +39,8 @@ public class AppConfig {
     }
 
     @Bean
-    public AuthorizationService authorizationService(UserServiceClient userServiceClient) {
-        return new AuthorizationService(userServiceClient);
+    public AuthorizationService authorizationService(UserServiceClient userServiceClient, AccountRepository accountRepository) {
+        return new AuthorizationService(userServiceClient, accountRepository);
     }
 
     @Bean
