@@ -23,7 +23,7 @@ public class AccountService {
         AccountEntity accountEntity = new AccountEntity(generateAccountNumberForUser(),
                 createAccountRequestDto.currency(), userModel.userSub());
 
-        Optional<AccountEntity> accountEntityByUserSub = Optional.ofNullable(accountRepository.findByUserSub(accountEntity.getUserSub()));
+        Optional<AccountEntity> accountEntityByUserSub = accountRepository.findByUserSub(accountEntity.getUserSub());
 
         if (accountEntityByUserSub.isPresent())
         {
@@ -31,14 +31,6 @@ public class AccountService {
         }
 
         return accountRepository.save(accountRepository.save(accountEntity));
-    }
-
-    @Transactional
-    public AccountEntity getAccountDetails(Long id) {
-        Optional<AccountEntity> accountEntityOptional = accountRepository.findById(id);
-
-        return accountEntityOptional.orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.CONFLICT, "User account already exist"));
     }
 
     private String generateAccountNumberForUser() {

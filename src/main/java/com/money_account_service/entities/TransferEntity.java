@@ -17,14 +17,14 @@ import java.time.Instant;
 @AllArgsConstructor
 public class TransferEntity {
 
-    public TransferEntity(String title, String idempotencyKey, Long accountId, String type) {
+    public TransferEntity(String title, String idempotencyKey, Long accountId, String type, Clock clock) {
         this.title = title;
-        this.transferDate = Clock.systemUTC().instant();
+        this.transferDate = clock.instant();
         this.idempotencyKey = idempotencyKey;
         this.accountId = accountId;
         this.type = type;
-        this.createdAt = Clock.systemUTC().instant();
-        this.updatedAt = Clock.systemUTC().instant();
+        this.createdAt = clock.instant();
+        this.updatedAt = clock.instant();
     }
 
     @Id

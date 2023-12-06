@@ -1,23 +1,14 @@
 package com.money_account_service.services
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.money_account_service.dtos.request.CreateAccountRequestDto
 import com.money_account_service.dtos.response.AccountDetailsResponseDto
 import com.money_account_service.dtos.response.AuthorizeResponseDto
-import com.money_account_service.dtos.response.CreateAccountResponseDto
 import com.money_account_service.entities.AccountEntity
 import com.money_account_service.repositories.AccountRepository
-import com.money_account_service.utility.UserServiceClient
-import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
-import org.springframework.test.context.TestPropertySource
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import spock.lang.Specification
 
 class AccountServiceContractTest extends BaseWeb {
 
@@ -32,9 +23,6 @@ class AccountServiceContractTest extends BaseWeb {
     def "Should add new account"() {
         given: "CreateAccountRequestDto is provided"
             CreateAccountRequestDto createAccountRequestDto1 = new CreateAccountRequestDto("PLN")
-
-        and: "CreateAccountResponseDto is provided"
-            CreateAccountResponseDto createAccountResponseDto = new CreateAccountResponseDto("123", 0L, "PLN")
 
         and: "AuthorizeResponseDto is provided"
         AuthorizeResponseDto authorizeResponseDto = AuthorizeResponseDto.builder()
@@ -51,9 +39,9 @@ class AccountServiceContractTest extends BaseWeb {
                     .header((HttpHeaders.AUTHORIZATION), "Bearer 123")
                     .content(objectMapper.writeValueAsString(createAccountRequestDto1)))
                     .andExpect(MockMvcResultMatchers.status().isOk())
-                    .andReturn()
-                    .response
-                    .contentAsString == objectMapper.writeValueAsString(createAccountResponseDto)
+                    .andExpect(MockMvcResultMatchers.jsonPath('$.accountNumber').isNotEmpty())
+                    .andExpect(MockMvcResultMatchers.jsonPath('$.balance').isNumber())
+                    .andExpect(MockMvcResultMatchers.jsonPath('$.currency').value('PLN'))
     }
 
     def "Should get account info"() {
@@ -64,14 +52,14 @@ class AccountServiceContractTest extends BaseWeb {
         AccountEntity accountEntity = AccountEntity.builder()
                 .accountNumber("123")
                 .currency("PLN")
-                .userSub("123")
+                .userSub("1234")
                 .build()
 
         and: "AuthorizeResponseDto is provided"
         AuthorizeResponseDto authorizeResponseDto = AuthorizeResponseDto.builder()
                 .email("mail@mail.com")
                 .name("kris")
-                .userSub("123")
+                .userSub("1234")
                 .build()
 
         and: "AccountEntity is added to database"
@@ -79,7 +67,7 @@ class AccountServiceContractTest extends BaseWeb {
         userServiceClient.authorize(_) >> authorizeResponseDto
 
         expect: "API call response is asserted"
-            mockMvc.perform(MockMvcRequestBuilders.get("/account/{id}/details", 1L)
+            mockMvc.perform(MockMvcRequestBuilders.get("/account/details", 1L)
                     .header((HttpHeaders.AUTHORIZATION), "Bearer 123"))
                     .andExpect(MockMvcResultMatchers.status().isOk())
                     .andReturn()

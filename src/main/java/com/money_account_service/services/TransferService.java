@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,10 +16,12 @@ public class TransferService {
 
     private TransferRepository transferRepository;
 
-    public TransferEntity transfer(TransferRequestDto transferRequestDto, Long accountId) {
-        TransferEntity transferEntity = new TransferEntity(transferRequestDto.title(), transferRequestDto.idempotencyKey(), accountId, "TRANSFER");
+    private Clock clock;
 
-        Optional<TransferEntity> transferEntityFoundByIdempotencyKey = Optional.ofNullable(transferRepository.findByIdempotencyKey(transferEntity.getIdempotencyKey()));
+    public TransferEntity transfer(TransferRequestDto transferRequestDto, Long accountId) {
+        TransferEntity transferEntity = new TransferEntity(transferRequestDto.title(), transferRequestDto.idempotencyKey(), accountId, "TRANSFER", clock);
+
+        Optional<TransferEntity> transferEntityFoundByIdempotencyKey = transferRepository.findByIdempotencyKey(transferEntity.getIdempotencyKey());
 
         if (transferEntityFoundByIdempotencyKey.isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "This transaction already exists");
@@ -34,7 +37,7 @@ public class TransferService {
     }
 
     public List<TransferEntity> getTransferHistory(Long accountId) {
-        Optional<List<TransferEntity>> optionalTransferEntityList = Optional.ofNullable(transferRepository.findAllTransfersForUser(accountId));
+        Optional<List<TransferEntity>> optionalTransferEntityList = transferRepository.findAllTransfersForUser(accountId);
 
         return optionalTransferEntityList.orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "You don't have any transactions yet"));
