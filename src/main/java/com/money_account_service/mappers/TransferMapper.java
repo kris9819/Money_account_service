@@ -18,7 +18,7 @@ public class TransferMapper {
                 .build();
     }
 
-    public static TransfersResponseDto mapTransfers(List<TransferEntity> transferEntityList) {
+    public static TransfersResponseDto map(List<TransferEntity> transferEntityList) {
         return TransfersResponseDto.builder()
                 .transfers(transferEntityList)
                 .build();

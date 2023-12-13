@@ -38,7 +38,7 @@ public class TransferController extends AuthorizationController{
     public TransfersResponseDto getTransferHistory(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
         AccountEntity account = authorize(accessToken);
         List<TransferEntity> transferList = transferService.getTransferHistory(account.getAccountId());
-        return TransferMapper.mapTransfers(transferList);
+        return TransferMapper.map(transferList);
     }
 
     @GetMapping("/transfers/{id}")

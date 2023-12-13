@@ -37,9 +37,12 @@ public class TransferService {
     }
 
     public List<TransferEntity> getTransferHistory(Long accountId) {
-        Optional<List<TransferEntity>> optionalTransferEntityList = transferRepository.findAllTransfersForUser(accountId);
+        List<TransferEntity> optionalTransferEntityList = transferRepository.findAllTransfersForUser(accountId);
 
-        return optionalTransferEntityList.orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "You don't have any transactions yet"));
+        if (optionalTransferEntityList.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "You don't have any transactions yet");
+        }
+
+        return optionalTransferEntityList;
     }
 }
