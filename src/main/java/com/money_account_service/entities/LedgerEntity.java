@@ -27,10 +27,10 @@ public class LedgerEntity {
     private Long ledgerRecordId;
 
     @Column(name = "debit_account_id")
-    private String debitAccountId;
+    private Long debitAccountId;
 
     @Column(name = "credit_account_id")
-    private String creditAccountId;
+    private Long creditAccountId;
 
     @Column(name = "debit_amount")
     private Long debitAmount;

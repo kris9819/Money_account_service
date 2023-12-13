@@ -17,13 +17,14 @@ import java.time.Instant;
 @AllArgsConstructor
 public class TransferEntity {
 
-    public TransferEntity(String title, String idempotencyKey, String type) {
+    public TransferEntity(String title, String idempotencyKey, Long accountId, String type, Clock clock) {
         this.title = title;
-        this.transferDate = Clock.systemUTC().instant();
+        this.transferDate = clock.instant();
         this.idempotencyKey = idempotencyKey;
+        this.accountId = accountId;
         this.type = type;
-        this.createdAt = Clock.systemUTC().instant();
-        this.updatedAt = Clock.systemUTC().instant();
+        this.createdAt = clock.instant();
+        this.updatedAt = clock.instant();
     }
 
     @Id
@@ -42,6 +43,9 @@ public class TransferEntity {
 
     @Column(name = "type")
     private String type;
+
+    @Column(name = "account_id")
+    private Long accountId;
 
     @Column(name = "created_at")
     private Instant createdAt;

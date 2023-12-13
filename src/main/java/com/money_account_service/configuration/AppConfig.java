@@ -19,6 +19,7 @@ import javax.net.ssl.X509TrustManager;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Clock;
 
 @Configuration
 public class AppConfig {
@@ -29,18 +30,18 @@ public class AppConfig {
     }
 
     @Bean
-    public TransferService transferService(TransferRepository transferRepository) {
-        return new TransferService(transferRepository);
+    public TransferService transferService(TransferRepository transferRepository, Clock clock) {
+        return new TransferService(transferRepository, clock);
     }
 
     @Bean
-    public TopUpService topUpService(TransferRepository transferRepository) {
-        return new TopUpService(transferRepository);
+    public TopUpService topUpService(TransferRepository transferRepository, Clock clock) {
+        return new TopUpService(transferRepository, clock);
     }
 
     @Bean
-    public AuthorizationService authorizationService(UserServiceClient userServiceClient) {
-        return new AuthorizationService(userServiceClient);
+    public AuthorizationService authorizationService(UserServiceClient userServiceClient, AccountRepository accountRepository) {
+        return new AuthorizationService(userServiceClient, accountRepository);
     }
 
     @Bean
@@ -58,12 +59,16 @@ public class AppConfig {
         return builder.build();
     }
 
-
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         return objectMapper;
+    }
+
+    @Bean
+    public Clock clock() {
+        return Clock.systemUTC();
     }
 
     private SSLContext getSSLContext() throws NoSuchAlgorithmException, KeyManagementException {

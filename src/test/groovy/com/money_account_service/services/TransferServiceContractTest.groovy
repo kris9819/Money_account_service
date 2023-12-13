@@ -1,44 +1,42 @@
 package com.money_account_service.services
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.money_account_service.dtos.request.TopUpRequestDto
 import com.money_account_service.dtos.request.TransferRequestDto
 import com.money_account_service.dtos.response.AuthorizeResponseDto
-import com.money_account_service.dtos.response.TopUpResponseDto
 import com.money_account_service.dtos.response.TransferResponseDto
 import com.money_account_service.dtos.response.TransfersResponseDto
+import com.money_account_service.entities.AccountEntity
 import com.money_account_service.entities.TransferEntity
 import com.money_account_service.repositories.TransferRepository
-import com.money_account_service.utility.UserServiceClient
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
-import org.springframework.test.context.TestPropertySource
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import spock.lang.Specification
 
 import java.time.Clock
+import java.time.Instant
 
 class TransferServiceContractTest extends BaseWeb {
 
     @Autowired
     private TransferRepository transferRepository
+    @SpringBean
+    private Clock clock = Mock(Clock)
     private TransferService transferService
 
     def setup() {
-        transferService = new TransferService(transferRepository)
+        transferService = new TransferService(transferRepository, clock)
     }
 
     def "Should do transfer to given account"() {
-        given: "TransferRequestDto is provided"
+        given: "Instant is mocked"
+        clock.instant() >> Instant.parse("2018-11-30T18:35:24.00Z")
+
+        and: "TransferRequestDto is provided"
         TransferRequestDto transferRequestDto = new TransferRequestDto("test", "123", "transfer", 0L, "123")
 
         and: "TransferResponseDto is provided"
-        TransferResponseDto transferResponseDto = new TransferResponseDto("???", "???", "transfer", Clock.systemUTC().instant(),0L)
+        TransferResponseDto transferResponseDto = new TransferResponseDto("???", "???", "transfer", clock.instant(),0L)
 
         and: "AuthorizeResponseDto is provided"
         AuthorizeResponseDto authorizeResponseDto = AuthorizeResponseDto.builder()
@@ -47,6 +45,14 @@ class TransferServiceContractTest extends BaseWeb {
                 .userSub("123")
                 .build()
 
+        and: "AccountEntity is provided"
+        AccountEntity accountEntity = AccountEntity.builder()
+                .accountNumber("123")
+                .currency("PLN")
+                .userSub("123")
+                .build()
+
+        accountRepository.save(accountEntity)
         userServiceClient.authorize(_) >> authorizeResponseDto
 
         expect: "API call response is asserted"
@@ -69,6 +75,7 @@ class TransferServiceContractTest extends BaseWeb {
                 .title("transfer1")
                 .transferDate(null)
                 .idempotencyKey("123")
+                .accountId(2)
                 .type("TRANSFER")
                 .createdAt(null)
                 .updatedAt(null)
@@ -79,28 +86,38 @@ class TransferServiceContractTest extends BaseWeb {
                 .title("transfer2")
                 .transferDate(null)
                 .idempotencyKey("1234")
+                .accountId(2)
                 .type("TRANSFER")
                 .createdAt(null)
                 .updatedAt(null)
                 .build()
 
         and: "TransferResponseDto is provided"
-        TransfersResponseDto transfersResponseDto = new TransfersResponseDto(List.of(transferEntity1, transferEntity2))
+        TransfersResponseDto transfersResponseDto = new TransfersResponseDto(List.of(transferEntity2, transferEntity1))
 
         and: "AuthorizeResponseDto is provided"
         AuthorizeResponseDto authorizeResponseDto = AuthorizeResponseDto.builder()
                 .email("mail@mail.com")
                 .name("kris")
-                .userSub("123")
+                .userSub("15")
                 .build()
 
-        and: "TransferEntities are added to database"
+        and: "AccountEntity is provided"
+        AccountEntity accountEntity = AccountEntity.builder()
+                .accountNumber("123")
+                .currency("PLN")
+                .userSub("15")
+                .build()
+
+
+        and: "TransferEntities and AccountEntity are added to database"
+        accountRepository.save(accountEntity)
         transferRepository.saveAll(List.of(transferEntity1, transferEntity2))
         userServiceClient.authorize(_) >> authorizeResponseDto
 
         expect: "API call response is asserted"
         mockMvc.perform(MockMvcRequestBuilders.get("/transfers")
-                .header((HttpHeaders.AUTHORIZATION), "Bearer 123"))
+                .header((HttpHeaders.AUTHORIZATION), "Bearer 1234"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn()
                 .response
@@ -129,10 +146,18 @@ class TransferServiceContractTest extends BaseWeb {
         AuthorizeResponseDto authorizeResponseDto = AuthorizeResponseDto.builder()
                 .email("mail@mail.com")
                 .name("kris")
-                .userSub("123")
+                .userSub("12345")
                 .build()
 
-        and: "TransferEntity is added to database"
+        and: "AccountEntity is provided"
+        AccountEntity accountEntity = AccountEntity.builder()
+                .accountNumber("123")
+                .currency("PLN")
+                .userSub("12345")
+                .build()
+
+        and: "TransferEntity and AccountEntity is added to database"
+        accountRepository.save(accountEntity)
         transferRepository.save(transferEntity)
         userServiceClient.authorize(_) >> authorizeResponseDto
 

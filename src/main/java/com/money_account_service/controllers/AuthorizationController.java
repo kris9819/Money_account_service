@@ -1,15 +1,15 @@
 package com.money_account_service.controllers;
 
-import com.money_account_service.models.UserModel;
+import com.money_account_service.entities.AccountEntity;
 import com.money_account_service.services.AuthorizationService;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 public abstract class AuthorizationController {
 
     private final AuthorizationService authorizationService;
 
-    public UserModel authorize(String token) {
-        return authorizationService.authorize(token);
+    public AccountEntity authorize(String token) {
+        return authorizationService.authorizeAccount(token);
     }
 }

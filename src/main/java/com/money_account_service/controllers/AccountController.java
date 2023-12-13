@@ -1,15 +1,14 @@
 package com.money_account_service.controllers;
 
 import com.money_account_service.dtos.request.CreateAccountRequestDto;
-import com.money_account_service.dtos.response.AccountDetailsResponseDto;
-import com.money_account_service.dtos.response.CreateAccountResponseDto;
-import com.money_account_service.mappers.ResponseMapper;
+import com.money_account_service.dtos.response.AccountResponseDto;
+import com.money_account_service.entities.AccountEntity;
+import com.money_account_service.mappers.AccountMapper;
+import com.money_account_service.models.UserModel;
 import com.money_account_service.services.AccountService;
 import com.money_account_service.services.AuthorizationService;
-import com.money_account_service.utility.UserServiceClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -20,19 +19,25 @@ public class AccountController extends AuthorizationController {
 
     private final AccountService accountService;
 
+    private final AuthorizationService authorizationService;
+
     public AccountController(AuthorizationService authorizationService, AccountService accountService) {
         super(authorizationService);
         this.accountService = accountService;
+        this.authorizationService = authorizationService;
     }
 
     @PostMapping("/account")
-    public CreateAccountResponseDto createAccount(@RequestBody CreateAccountRequestDto createAccountRequestDto, @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
-        return ResponseMapper.accountEntityToCreateAccountResponse(accountService.createAccount(createAccountRequestDto, authorize(accessToken)));
+    public AccountResponseDto createAccount(@RequestBody CreateAccountRequestDto createAccountRequestDto, @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
+        UserModel user = authorizationService.authorizeUser(accessToken);
+        AccountEntity account = accountService.createAccount(createAccountRequestDto, user);
+        return AccountMapper.map(account);
     }
 
-    @GetMapping("/account/{id}/details")
-    public AccountDetailsResponseDto getAccountDetails(@PathVariable Long id, @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
-        return ResponseMapper.accountEntityToAccountDetailsResponse(accountService.getAccountDetails(id, authorize(accessToken)));
+    @GetMapping("/account/details")
+    public AccountResponseDto getAccountDetails(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
+        AccountEntity account = authorize(accessToken);
+        return AccountMapper.map(account);
     }
 
 }

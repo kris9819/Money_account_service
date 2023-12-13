@@ -1,6 +1,7 @@
 package com.money_account_service.services
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.money_account_service.repositories.AccountRepository
 import com.money_account_service.repositories.TransferRepository
 import com.money_account_service.utility.UserServiceClient
 import org.spockframework.spring.SpringBean
@@ -23,6 +24,8 @@ import spock.lang.Specification
 class BaseWeb extends Specification {
 
     @Autowired
+    AccountRepository accountRepository
+    @Autowired
     MockMvc mockMvc
     @Autowired
     ObjectMapper objectMapper
@@ -33,7 +36,7 @@ class BaseWeb extends Specification {
     static PostgreSQLContainer postgreSQL = new PostgreSQLContainer("postgres:latest")
 
     @Shared
-    PostgreSQLContainer postgreSQLContainer = postgreSQL;
+    PostgreSQLContainer postgreSQLContainer = postgreSQL
 
     @DynamicPropertySource
     static void postgresqlProperties(DynamicPropertyRegistry registry) {
@@ -44,6 +47,6 @@ class BaseWeb extends Specification {
     }
 
     def setup() {
-        authorizationService = new AuthorizationService(userServiceClient)
+        authorizationService = new AuthorizationService(userServiceClient, accountRepository)
     }
 }
