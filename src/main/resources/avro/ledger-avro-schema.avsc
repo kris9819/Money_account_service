@@ -1,0 +1,53 @@
+{
+  "doc": "Ledger schema to keep data integrity",
+  "fields": [
+    {
+      "doc": "Ledger id",
+      "name": "ledger_record_id",
+      "type": "long"
+    },
+    {
+      "doc": "Debit account id",
+      "name": "debit_account_id",
+      "type": "long"
+    },
+    {
+      "doc": "Credit account id",
+      "name": "credit_account_id",
+      "type": "long"
+    },
+    {
+      "doc": "Amount of money in debit account",
+      "name": "debit_amount",
+      "type": "long"
+    },
+    {
+      "doc": "Currency of debit account",
+      "name": "debit_currency",
+      "type": "string"
+    },
+    {
+      "doc": "Amount of money in credit account",
+      "name": "credit_amount",
+      "type": "long"
+    },
+    {
+      "doc": "Currency of credit account",
+      "name": "credit_currency",
+      "type": "string"
+    },
+    {
+      "doc": "Value of exchange rate if needed",
+      "name": "exchange_rate",
+      "type": "long"
+    },
+    {
+      "doc": "Corresponding trasfer id",
+      "name": "transfer_id",
+      "type": "long"
+    }
+  ],
+  "name": "LedgerAvroRecord",
+  "namespace": "com.money_account_service.entities",
+  "type": "record"
+}

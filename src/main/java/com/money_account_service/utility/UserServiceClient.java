@@ -21,7 +21,7 @@ public class UserServiceClient {
 
     private final ObjectMapper objectMapper;
     @Value("${authorize.url}")
-    private String AUTHORIZE_URL = "http://localhost:8081/authorize";
+    private String AUTHORIZE_URL;
 
     public AuthorizeResponseDto authorize(String accessToken) {
         try {
