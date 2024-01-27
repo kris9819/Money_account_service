@@ -8,10 +8,12 @@ import com.money_account_service.services.AccountService;
 import com.money_account_service.services.AuthorizationService;
 import com.money_account_service.services.TopUpService;
 import com.money_account_service.services.TransferService;
+import com.money_account_service.services.kafka.LedgerMessagePublisher;
 import com.money_account_service.utility.UserServiceClient;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -30,13 +32,18 @@ public class AppConfig {
     }
 
     @Bean
-    public TransferService transferService(TransferRepository transferRepository, Clock clock) {
-        return new TransferService(transferRepository, clock);
+    public TransferService transferService(TransferRepository transferRepository, LedgerMessagePublisher ledgerMessagePublisher, Clock clock) {
+        return new TransferService(transferRepository, ledgerMessagePublisher, clock);
     }
 
     @Bean
     public TopUpService topUpService(TransferRepository transferRepository, Clock clock) {
         return new TopUpService(transferRepository, clock);
+    }
+
+    @Bean
+    public LedgerMessagePublisher ledgerMessagePublisher(KafkaTemplate kafkaTemplate) {
+        return new LedgerMessagePublisher(kafkaTemplate);
     }
 
     @Bean

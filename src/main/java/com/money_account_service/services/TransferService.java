@@ -1,8 +1,11 @@
 package com.money_account_service.services;
 
 import com.money_account_service.dtos.request.TransferRequestDto;
+import com.money_account_service.entities.LedgerEntity;
 import com.money_account_service.entities.TransferEntity;
+import com.money_account_service.mappers.AvroMapper;
 import com.money_account_service.repositories.TransferRepository;
+import com.money_account_service.services.kafka.LedgerMessagePublisher;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,10 +19,14 @@ public class TransferService {
 
     private TransferRepository transferRepository;
 
+    private LedgerMessagePublisher ledgerMessagePublisher;
+
     private Clock clock;
 
     public TransferEntity transfer(TransferRequestDto transferRequestDto, Long accountId) {
         TransferEntity transferEntity = new TransferEntity(transferRequestDto.title(), transferRequestDto.idempotencyKey(), accountId, "TRANSFER", clock);
+
+        ledgerMessagePublisher.publish(AvroMapper.entityToAvro(buildLedgerEntity(transferRequestDto, transferEntity)));
 
         Optional<TransferEntity> transferEntityFoundByIdempotencyKey = transferRepository.findByIdempotencyKey(transferEntity.getIdempotencyKey());
 
@@ -44,5 +51,19 @@ public class TransferService {
         }
 
         return optionalTransferEntityList;
+    }
+
+    private LedgerEntity buildLedgerEntity(TransferRequestDto transferRequestDto, TransferEntity transferEntity) {
+        return LedgerEntity.builder()
+                .debitAccountId(1L)
+                .creditAccountId(transferEntity.getAccountId())
+                .debitAmount(transferRequestDto.balance())
+                .creditAmount(transferRequestDto.balance())
+                .debitCurrency("PLN")
+                .creditCurrency("PLN")
+                .exchangeRate(1L)
+                .transferId(transferEntity.getTransferId())
+                .createdAt(Clock.systemUTC().instant())
+                .updatedAt(Clock.systemUTC().instant()).build();
     }
 }
