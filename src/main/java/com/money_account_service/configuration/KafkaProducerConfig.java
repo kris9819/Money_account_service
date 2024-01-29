@@ -1,6 +1,6 @@
 package com.money_account_service.configuration;
 
-import com.money_account_service.entities.LedgerAvroRecord;
+//import com.money_account_service.entities.LedgerAvroRecord;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -26,16 +26,16 @@ public class KafkaProducerConfig {
     @Value("${spring.kafka.producer.schema.registry.url}")
     String schemaRegistryUrl;
 
-    @Bean
-    public KafkaTemplate<String, LedgerAvroRecord> kafkaTemplate(ProducerFactory<String, LedgerAvroRecord> producerFactory) {
-        return new KafkaTemplate<>(producerFactory);
-    }
-
-    @Bean
-    public ProducerFactory<String, LedgerAvroRecord> producerFactory() {
-        Map<String, Object> producerConfig = getProducerConfig();
-        return new DefaultKafkaProducerFactory<>(producerConfig);
-    }
+//    @Bean
+//    public KafkaTemplate<String, LedgerAvroRecord> kafkaTemplate(ProducerFactory<String, LedgerAvroRecord> producerFactory) {
+//        return new KafkaTemplate<>(producerFactory);
+//    }
+//
+//    @Bean
+//    public ProducerFactory<String, LedgerAvroRecord> producerFactory() {
+//        Map<String, Object> producerConfig = getProducerConfig();
+//        return new DefaultKafkaProducerFactory<>(producerConfig);
+//    }
 
     private Map<String, Object> getProducerConfig() {
         Map<String, Object> properties = new HashMap<>();

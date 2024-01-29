@@ -26,7 +26,7 @@ public class TransferService {
     public TransferEntity transfer(TransferRequestDto transferRequestDto, Long accountId) {
         TransferEntity transferEntity = new TransferEntity(transferRequestDto.title(), transferRequestDto.idempotencyKey(), accountId, "TRANSFER", clock);
 
-        ledgerMessagePublisher.publish(AvroMapper.entityToAvro(buildLedgerEntity(transferRequestDto, transferEntity)));
+//        ledgerMessagePublisher.publish(AvroMapper.entityToAvro(buildLedgerEntity(transferRequestDto, transferEntity)));
 
         Optional<TransferEntity> transferEntityFoundByIdempotencyKey = transferRepository.findByIdempotencyKey(transferEntity.getIdempotencyKey());
 

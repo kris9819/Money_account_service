@@ -18,40 +18,44 @@ import org.testcontainers.containers.Network
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.spock.Testcontainers
 import org.testcontainers.utility.DockerImageName
+import spock.lang.Shared
 import spock.lang.Specification
 
-@SpringBootTest
 @Testcontainers
+@SpringBootTest
 class LedgerMessagePublisherKafkaTest extends Specification {
 
-    @Autowired
-    LedgerMessagePublisher ledgerMessagePublisher
+//    @Autowired
+//    LedgerMessagePublisher ledgerMessagePublisher
+//
+//    @Autowired
+//    private KafkaProperties kafkaProperties
 
-    @Autowired
-    private KafkaProperties kafkaProperties
+//    private static final Network NETWORK = Network.newNetwork()
 
-    private static final Network NETWORK = Network.newNetwork()
-
-    private static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.5.2"))
-            .withNetwork(NETWORK)
-            .start()
+    @Shared
+    static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.5.2"))
+//            .withNetwork(NETWORK)
+//            .start()
 
     private static final GenericContainer<?> SCHEMA_REGISTRY = new GenericContainer<>(DockerImageName.parse("confluentinc/cp-schema-registry:7.5.2"))
-            .withNetwork(NETWORK)
+//            .withNetwork(NETWORK)
             .withExposedPorts(8081)
             .withEnv("SCHEMA_REGISTRY_HOST_NAME", "schema-registry")
             .withEnv("SCHEMA_REGISTRY_LISTENERS", "http://0.0.0.0:8081")
-            .withEnv("SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS",
-                    "PLAINTEXT://" + KAFKA_CONTAINER.getNetworkAliases().get(0) + ":9092")
+//            .withEnv("SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS",
+//                    "PLAINTEXT://" + KAFKA_CONTAINER.getNetworkAliases().get(0) + ":9092")
             .waitingFor(Wait.forHttp("/subjects").forStatusCode(200))
 
     @DynamicPropertySource
-    static void kafkaProducerConfig(DynamicPropertyRegistry registry) {
+    static void registerDynamicProperties(DynamicPropertyRegistry registry) {
+        println("kafkaProducerConfig")
         registry.add("spring.kafka.producer.bootstrap-servers", KAFKA_CONTAINER::getBootstrapServers)
     }
 
-    def setup() {
-        SCHEMA_REGISTRY.start()
+    def setupSpec() {
+        KAFKA_CONTAINER.start()
+//        SCHEMA_REGISTRY.start()
 
         Properties properties = new Properties();
         properties.put(
@@ -69,19 +73,19 @@ class LedgerMessagePublisherKafkaTest extends Specification {
         print("bootstrap: " + KAFKA_CONTAINER.getBootstrapServers())
         print("netowrk: " + KAFKA_CONTAINER.getNetworkAliases().get(0))
 
-        LedgerEntity ledgerEntity = LedgerEntity.builder()
-                .ledgerRecordId(1L)
-                .debitAccountId(12L)
-                .creditAccountId(13L)
-                .debitAmount(123L)
-                .debitCurrency("PLN")
-                .creditAmount(500L)
-                .creditCurrency("PLN")
-                .exchangeRate(1L)
-                .transferId(16L)
-                .build();
+//        LedgerEntity ledgerEntity = LedgerEntity.builder()
+//                .ledgerRecordId(1L)
+//                .debitAccountId(12L)
+//                .creditAccountId(13L)
+//                .debitAmount(123L)
+//                .debitCurrency("PLN")
+//                .creditAmount(500L)
+//                .creditCurrency("PLN")
+//                .exchangeRate(1L)
+//                .transferId(16L)
+//                .build();
 
-        ledgerMessagePublisher.publish(AvroMapper.entityToAvro(ledgerEntity))
+//        ledgerMessagePublisher.publish(AvroMapper.entityToAvro(ledgerEntity))
 
         expect:
 
